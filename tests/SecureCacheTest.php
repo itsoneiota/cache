@@ -1,5 +1,5 @@
 <?php
-namespace oneiota\cache;
+namespace itsoneiota\cache;
 /**
  * Tests for SecureCache.
  *

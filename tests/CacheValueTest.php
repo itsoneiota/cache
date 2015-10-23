@@ -1,5 +1,5 @@
 <?php
-namespace oneiota\cache;
+namespace itsoneiota\cache;
 use \DateTime;
 /**
  * Tests for CacheValue.

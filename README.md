@@ -18,7 +18,7 @@ The library's suite of unit tests can be run by calling `vendor/bin/phpunit` fro
 Basic Usage
 -----------
 	
-	use \oneiota\cache;
+	use \itsoneiota\cache;
 
 	$mc = new \Memcached();
 	// Configure memcached…
@@ -33,7 +33,7 @@ Prefixing Cache Keys
 
 If you wish to avoid cache key collisions, you can initialise your cache with a key prefix, this will be added to all keys when getting, setting and deleting. For example:
 
-	use \oneiota\cache;
+	use \itsoneiota\cache;
 
 	$mc = new \Memcached();
 	// Configure memcached…
@@ -48,7 +48,7 @@ Default Expiry Times
 
 When creating a cache, you can specify a default time to live that can be used when adding and setting. This can be overridden when adding and setting by specifying an explicit expiry time.
 
-	use \oneiota\cache;
+	use \itsoneiota\cache;
 
 	$mc = new \Memcached();
 	// Configure memcached…
@@ -63,7 +63,7 @@ Encrypting Cache Contents
 
 `SecureCache` is a subclass of `Cache` that encrypts its contents using two-way encryption.
 
-	use \oneiota\cache;
+	use \itsoneiota\cache;
 
 	$mc = new \Memcached();
 	// Configure memcached…
@@ -78,7 +78,7 @@ Bonus Caches (Cacheback)
 ### `InMemoryCacheFront`
 If you're likely to make several calls to a cache within a request, possibly to the same value, `InMemoryCacheFront` can prevent unnecessary network calls to the Memcached server, by providing a read- and write-through cache on top of a `Cache` instance. The number of items held in memory is limited to 100 by default, but that can be changed with a constructor argument.
 
-	use \oneiota\cache;
+	use \itsoneiota\cache;
 
 	$mc = new \Memcached();
 	// Configure memcached…
@@ -93,7 +93,7 @@ If you need to simulate a cache, without a Memcached server, `InMemoryCache` wil
 ### `MockCache`
 For testing purposes, `MockCache` simulates a cache, and allows you to check that values have been set, and what their expiry times are, without having to go through all the hassle of using PHPUnit mocks. `getExpiration()` allows you to check the expiration of a key. `timePasses()` allows you to simulate the passage of time, advancing by a given number of seconds and expiring cache items accordingly.
 
-	use \oneiota\cache;
+	use \itsoneiota\cache;
 
 	$cache = new MockCache();
 

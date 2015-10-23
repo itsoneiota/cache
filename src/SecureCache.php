@@ -1,5 +1,5 @@
 <?php
-namespace oneiota\cache;
+namespace itsoneiota\cache;
 /**
  * Limited interface to Memcached.
  * All values are encrypted when stored.

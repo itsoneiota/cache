@@ -1,5 +1,5 @@
 <?php 
-namespace oneiota\cache;
+namespace itsoneiota\cache;
 
 /**
  * Wrapper that provides a read- and write-through in-memory cache for a Cache instance.

@@ -1,5 +1,5 @@
 {
-	"name":"oneiota/cache",
+	"name":"itsoneiota/cache",
 	"description": "One iota Cache library.",
 	"type":"library",
     "keywords": ["cache"],
@@ -7,7 +7,7 @@
     "authors": [
         {
             "name": "Ross McFarlane",
-            "email": "ross.mcfarlane@oneiota.co.uk"
+            "email": "ross.mcfarlane@itsoneiota.com"
         }
     ],
     "license":"proprietary",
@@ -19,7 +19,7 @@
 	},
 	"autoload": {
         "psr-4": {
-            "oneiota\\cache\\": "src/"
+            "itsoneiota\\cache\\": "src/"
         }
     }
 }

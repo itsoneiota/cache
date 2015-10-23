@@ -1,5 +1,5 @@
 <?php
-namespace oneiota\cache;
+namespace itsoneiota\cache;
 /**
  * Exceptions thrown when a caching object finds an unwanted duplicate.
  *

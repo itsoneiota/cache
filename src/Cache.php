@@ -1,5 +1,5 @@
 <?php
-namespace oneiota\cache;
+namespace itsoneiota\cache;
 use \base\common\domain\Store;
 
 /**

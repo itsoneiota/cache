@@ -1,11 +1,11 @@
 <?php
-namespace oneiota\cache;
+namespace itsoneiota\cache;
 use \base\common\domain\Store;
 /**
  * Mock cache.
  * @codeCoverageIgnore
  */
-class MockCache extends \oneiota\cache\Cache {
+class MockCache extends \itsoneiota\cache\Cache {
 	
 	protected $contents = array();
 	protected $expirations = array();
