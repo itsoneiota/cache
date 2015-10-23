@@ -1,0 +1,13 @@
+syntax: glob
+
+# Mac OS bits
+.DS_Store
+.metadata
+.settings
+.buildpath
+
+# Good ol' emacs
+*~
+
+# Composer Vendor
+vendor

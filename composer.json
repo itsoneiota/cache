@@ -1,0 +1,25 @@
+{
+	"name":"oneiota/cache",
+	"description": "One iota Cache library.",
+	"type":"library",
+    "keywords": ["cache"],
+    "homepage": "http://itsoneiota.com",
+    "authors": [
+        {
+            "name": "Ross McFarlane",
+            "email": "ross.mcfarlane@oneiota.co.uk"
+        }
+    ],
+    "license":"proprietary",
+	"require":{
+		"php":">=5.3.5"
+	},
+	"require-dev":{
+		"phpunit/phpunit": "*"
+	},
+	"autoload": {
+        "psr-4": {
+            "oneiota\\cache\\": "src/"
+        }
+    }
+}
