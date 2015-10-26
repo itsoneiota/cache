@@ -5,7 +5,7 @@ namespace itsoneiota\cache;
  *
  **/
 class CacheTest extends \PHPUnit_Framework_TestCase {
-	
+
 	protected $sut;
 	protected $cache;
 
@@ -13,7 +13,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 		$this->cache = $this->getMockBuilder('\Memcached')->disableOriginalConstructor()->getMock();
 		$this->sut = new Cache($this->cache);
 	}
-	
+
 	/**
 	 * It should add a KVP.
 	 * @test
@@ -22,7 +22,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 		$this->cache->expects($this->once())->method('add')->with($this->equalTo('myKey'),$this->equalTo('myValue'),$this->equalTo(0))->will($this->returnValue(TRUE));
 		$this->assertTrue($this->sut->add('myKey','myValue'));
 	}
-	
+
 	/**
 	 * It should add a KVP.
 	 * @test
@@ -47,7 +47,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 		$this->cache->expects($this->once())->method('add')->with($this->equalTo('NEWPREFIX.myKey'),$this->equalTo('myValue'),$this->equalTo(0))->will($this->returnValue(TRUE));
 		$this->assertTrue($this->sut->add('myKey','myValue'));
 	}
-	
+
 	/**
 	 * It should get a KVP.
 	 * @test
@@ -56,7 +56,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 		$this->cache->expects($this->once())->method('get')->with($this->equalTo('myKey'))->will($this->returnValue('myValue'));
 		$this->assertEquals('myValue', $this->sut->get('myKey'));
 	}
-	
+
 	/**
 	 * It should get a KVP.
 	 * @test
@@ -66,7 +66,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 		$this->cache->expects($this->once())->method('get')->with($this->equalTo('MYPREFIX.myKey'))->will($this->returnValue('myValue'));
 		$this->assertEquals('myValue', $this->sut->get('myKey'));
 	}
-	
+
 	/**
 	 * It should add a KVP using the default expiration time.
 	 * @test
@@ -76,7 +76,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 		$this->sut = new Cache($this->cache,NULL,5);
 		$this->assertTrue($this->sut->add('myKey','myValue'));
 	}
-	
+
 	/**
 	 * It should store an retrieve a KVP using an explicit expiration time.
 	 * @test
@@ -96,7 +96,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 		$this->sut = new Cache($this->cache);
 		$this->assertTrue($this->sut->set('myKey','myValue',10));
 	}
-	
+
 	/**
 	 * It should replace a KVP.
 	 * @test
@@ -105,7 +105,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 		$this->cache->expects($this->once())->method('replace')->with($this->equalTo('myKey'),$this->equalTo('myValue'),$this->equalTo(0))->will($this->returnValue(TRUE));
 		$this->assertTrue($this->sut->replace('myKey','myValue'));
 	}
-	
+
 	/**
 	 * It should replace a KVP.
 	 * @test
@@ -115,7 +115,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 		$this->cache->expects($this->once())->method('replace')->with($this->equalTo('MYPREFIX.myKey'),$this->equalTo('myValue'),$this->equalTo(0))->will($this->returnValue(TRUE));
 		$this->assertTrue($this->sut->replace('myKey','myValue'));
 	}
-	
+
 	/**
 	 * It should add a KVP using the default expiration time.
 	 * @test
@@ -125,7 +125,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 		$this->sut = new Cache($this->cache,NULL,5);
 		$this->assertTrue($this->sut->replace('myKey','myValue'));
 	}
-	
+
 	/**
 	 * It should store an retrieve a KVP using an explicit expiration time.
 	 * @test
@@ -135,7 +135,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 		$this->sut = new Cache($this->cache);
 		$this->assertTrue($this->sut->replace('myKey','myValue',10));
 	}
-	
+
 	/**
 	 * It should delete a KVP.
 	 * @test
@@ -144,7 +144,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 		$this->cache->expects($this->once())->method('delete')->with($this->equalTo('myKey'))->will($this->returnValue(TRUE));
 		$this->assertTrue($this->sut->delete('myKey'));
 	}
-	
+
 	/**
 	 * It should flush the cache.
 	 * @test
@@ -183,5 +183,28 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 		$this->cache->expects($this->once())->method('decrement')->with($this->equalTo('myKey'))->will($this->returnValue(TRUE));
 		$this->assertTrue($this->sut->decrement('myKey'));
 	}
-	
+
+	/**
+	 * It should get multiple keys at once.
+	 * @test
+	 */
+	public function canGetMulti() {
+		$this->cache->expects($this->once())->method('getMulti')->with($this->equalTo(['a','b']))->will($this->returnValue(['a'=>TRUE,'b'=>FALSE]));
+		$result = $this->sut->get(['a','b']);
+		$this->assertTrue($result['a']);
+		$this->assertFalse($result['b']);
+	}
+
+	/**
+	 * It should get multiple keys at once.
+	 * @test
+	 */
+	public function canGetMultiWithPrefix() {
+		$this->sut = new Cache($this->cache, 'MYPREFIX');
+		$this->cache->expects($this->once())->method('getMulti')->with($this->equalTo(['MYPREFIX.a','MYPREFIX.b']))->will($this->returnValue(['MYPREFIX.a'=>TRUE,'MYPREFIX.b'=>FALSE]));
+		$result = $this->sut->get(['a','b']);
+		$this->assertTrue($result['a']);
+		$this->assertFalse($result['b']);
+	}
+
 }
