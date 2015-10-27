@@ -5,14 +5,14 @@ namespace itsoneiota\cache;
  *
  **/
 class InMemoryCacheTest extends \PHPUnit_Framework_TestCase {
-	
+
 	protected $sut;
 	protected $cache;
 
 	public function setUp() {
 		$this->sut = new InMemoryCache();
 	}
-	
+
 	/**
 	 * It should add a KVP.
 	 * @test
@@ -37,6 +37,13 @@ class InMemoryCacheTest extends \PHPUnit_Framework_TestCase {
 		// Set new value
 		$this->assertTrue($this->sut->set('otherKey', 'otherValue'));
 		$this->assertEquals('otherValue', $this->sut->get('otherKey'));
+
+		// Multiget
+		$results = $this->sut->get(['otherKey', 'myKey', 'nonexistent', 'myKey2']);
+		$this->assertEquals('otherValue', $results['otherKey']);
+		$this->assertEquals('newValue', $results['myKey']);
+		$this->assertNull($results['nonexistent']);
+		$this->assertEquals('myValue2', $results['myKey2']);
 
 		// Replace
 		$this->assertTrue($this->sut->replace('myKey2', 'newValue2'));
@@ -78,5 +85,5 @@ class InMemoryCacheTest extends \PHPUnit_Framework_TestCase {
 		$this->assertNull($this->sut->get('myKey2'));
 		$this->assertNull($this->sut->get('otherKey'));
 	}
-	
+
 }

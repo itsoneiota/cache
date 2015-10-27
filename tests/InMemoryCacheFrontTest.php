@@ -5,9 +5,9 @@ namespace itsoneiota\cache;
  *
  **/
 class InMemoryCacheFrontTest extends \PHPUnit_Framework_TestCase {
-	
+
 	protected $sut;
-	
+
 	public function setUp() {
 		$this->cache = new MockCache();
 		$this->sut = new InMemoryCacheFront($this->cache);
@@ -76,7 +76,7 @@ class InMemoryCacheFrontTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('tri', $this->sut->get('three'));
 		$this->assertEquals('dau', $this->sut->get('two'));
 		$this->assertEquals('eins', $this->sut->get('one')); // Only this one should have dropped.
-		
+
 	}
 
 	/**
@@ -87,7 +87,7 @@ class InMemoryCacheFrontTest extends \PHPUnit_Framework_TestCase {
 		$this->sut->add('myKey', 'before');
 		$this->assertEquals('before', $this->cache->get('myKey'));
 		$this->assertEquals('before', $this->sut->get('myKey'));
-		
+
 
 		// We can be sure that the SUT has cached the value by changing it in the underlying cache.
 		$this->cache->set('myKey', 'after');
@@ -162,6 +162,29 @@ class InMemoryCacheFrontTest extends \PHPUnit_Framework_TestCase {
 		$this->sut->set('nonNumeric', 'A');
 		$this->assertFalse($this->sut->increment('nonNumeric'));
 		$this->assertFalse($this->sut->decrement('nonNumeric'));
+	}
+
+	/**
+	 * It should get multiple keys.
+	 * @test
+	 */
+	public function canMultiGet() {
+		$this->cache->set('myKey', 'before');
+		$this->cache->set('otherKey', 'otherValue');
+
+		$this->assertEquals('before', $this->sut->get('myKey'));
+
+		$results = $this->sut->get(['myKey','otherKey']);
+		$this->assertEquals('before', $results['myKey']);
+		$this->assertEquals('otherValue', $results['otherKey']);
+
+		// We can be sure that the SUT has cached the value by changing it in the underlying cache.
+		$this->cache->set('myKey', 'after');
+		$this->cache->set('otherKey', 'otherAfter');
+
+		$results = $this->sut->get(['myKey','otherKey']);
+		$this->assertEquals('before', $results['myKey']);
+		$this->assertEquals('otherValue', $results['otherKey']);
 	}
 
 }

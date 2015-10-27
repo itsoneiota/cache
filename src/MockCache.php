@@ -1,17 +1,16 @@
 <?php
 namespace itsoneiota\cache;
-use \base\common\domain\Store;
 /**
  * Mock cache.
  * @codeCoverageIgnore
  */
 class MockCache extends \itsoneiota\cache\Cache {
-	
+
 	protected $contents = array();
 	protected $expirations = array();
 	protected $defaultExpiration;
 	protected $keyPrefix;
-	
+
 	/**
 	 * Constructor.
 	 *
@@ -20,7 +19,7 @@ class MockCache extends \itsoneiota\cache\Cache {
 		$this->setDefaultExpiration($defaultExpiration);
 		$this->setKeyPrefix($keyPrefix);
 	}
-	
+
 	public function getContents() {
 		return $this->contents;
 	}
@@ -47,13 +46,13 @@ class MockCache extends \itsoneiota\cache\Cache {
 	/**
 	 * Map the expiration value. Use instance default if none.
 	 *
-	 * @param int $expiration 
+	 * @param int $expiration
 	 * @return int Mapped expiration.
 	 */
 	public function mapExpiration($expiration=NULL) {
 		return is_null($expiration) ? $this->defaultExpiration : $expiration;
 	}
-		
+
 	/**
 	 * Hook method to map a value, for example to encrypt the value.
 	 *
@@ -63,18 +62,18 @@ class MockCache extends \itsoneiota\cache\Cache {
 	protected function mapValue($value) {
 		return $value;
 	}
-	
+
 	/**
 	 * Hook method to convert a mapped value back to the original.
 	 * i.e. $a == unmapValue(mapValue($a))
 	 *
-	 * @param string $value 
+	 * @param string $value
 	 * @return mixed Unmapped value.
 	 */
 	protected function unmapValue($value) {
 		return $value;
 	}
-	
+
 	/**
 	 * Add an item under a new key.
 	 *
@@ -88,16 +87,16 @@ class MockCache extends \itsoneiota\cache\Cache {
 		if (array_key_exists($mappedKey, $this->contents)) {
 			return FALSE;
 		}
-		
+
 		$this->contents[$mappedKey] = $this->mapValue($value);
 		$this->expirations[$mappedKey] = $expiration;
 		return TRUE;
 	}
-	
+
 	/**
 	 * Delete an item.
 	 *
-	 * @param string $key 
+	 * @param string $key
 	 * @return boolean Returns TRUE on success or FALSE on failure.
 	 */
 	public function delete($key) {
@@ -108,7 +107,7 @@ class MockCache extends \itsoneiota\cache\Cache {
 		unset($this->contents[$key]);
 		return TRUE;
 	}
-	
+
 	/**
 	 * Invalidate all items in the cache.
 	 *
@@ -118,7 +117,7 @@ class MockCache extends \itsoneiota\cache\Cache {
 		$this->contents = array();
 		return TRUE;
 	}
-	
+
 	/**
 	 * Retrieve an item.
 	 *
@@ -126,9 +125,21 @@ class MockCache extends \itsoneiota\cache\Cache {
 	 * @return mixed Returns the value stored in the cache or NULL otherwise.
 	 */
 	public function get($key) {
-		return array_key_exists($this->mapKey($key), $this->contents) ? $this->unmapValue($this->contents[$this->mapKey($key)]) : NULL;
-	}
-	
+ 		return is_array($key) ? $this->multiGet($key) : $this->singleGet($key);
+ 	}
+
+ 	protected function singleGet($key){
+ 		return array_key_exists($this->mapKey($key), $this->contents) ? $this->unmapValue($this->contents[$this->mapKey($key)]) : NULL;
+ 	}
+
+ 	protected function multiGet(array $keys){
+ 		$results = [];
+ 		foreach ($keys as $key) {
+ 			$results[$key] = $this->singleGet($key);
+ 		}
+ 		return $results;
+ 	}
+
 	/**
 	 * Replace the item under an existing key.
 	 *
@@ -144,7 +155,7 @@ class MockCache extends \itsoneiota\cache\Cache {
 		$this->contents[$this->mapKey($key)] = $this->mapValue($value);
 		return TRUE;
 	}
-	
+
 	/**
 	 * Store an item.
 	 *

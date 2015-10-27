@@ -4,9 +4,9 @@ namespace itsoneiota\cache;
  * Wrapper for a simple array.
  */
 class InMemoryCache extends Cache {
-	
+
 	protected $contents = array();
-	
+
 	/**
 	 * Constructor.
 	 *
@@ -14,7 +14,7 @@ class InMemoryCache extends Cache {
 	public function __construct(){
 		// No-op.
 	}
-	
+
 	/**
 	 * Add an item under a new key.
 	 *
@@ -28,15 +28,15 @@ class InMemoryCache extends Cache {
 		if (array_key_exists($mappedKey, $this->contents)) {
 			return FALSE;
 		}
-		
+
 		$this->contents[$mappedKey] = $this->mapValue($value);
 		return TRUE;
 	}
-	
+
 	/**
 	 * Delete an item.
 	 *
-	 * @param string $key 
+	 * @param string $key
 	 * @return boolean Returns TRUE on success or FALSE on failure.
 	 */
 	public function delete($key) {
@@ -47,7 +47,7 @@ class InMemoryCache extends Cache {
 		unset($this->contents[$key]);
 		return TRUE;
 	}
-	
+
 	/**
 	 * Invalidate all items in the cache.
 	 *
@@ -57,7 +57,7 @@ class InMemoryCache extends Cache {
 		$this->contents = array();
 		return TRUE;
 	}
-	
+
 	/**
 	 * Retrieve an item.
 	 *
@@ -65,9 +65,21 @@ class InMemoryCache extends Cache {
 	 * @return mixed Returns the value stored in the cache or NULL otherwise.
 	 */
 	public function get($key) {
-		return array_key_exists($this->mapKey($key), $this->contents) ? $this->unmapValue($this->contents[$this->mapKey($key)]) : NULL;
-	}
-	
+		return is_array($key) ? $this->multiGet($key) : $this->singleGet($key);
+  	}
+
+  	protected function singleGet($key){
+  		return array_key_exists($this->mapKey($key), $this->contents) ? $this->unmapValue($this->contents[$this->mapKey($key)]) : NULL;
+  	}
+
+  	protected function multiGet(array $keys){
+  		$results = [];
+  		foreach ($keys as $key) {
+  			$results[$key] = $this->singleGet($key);
+  		}
+  		return $results;
+  	}
+
 	/**
 	 * Replace the item under an existing key.
 	 *
@@ -83,7 +95,7 @@ class InMemoryCache extends Cache {
 		$this->contents[$this->mapKey($key)] = $this->mapValue($value);
 		return TRUE;
 	}
-	
+
 	/**
 	 * Store an item.
 	 *

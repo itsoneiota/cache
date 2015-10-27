@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace itsoneiota\cache;
 
 /**
@@ -9,7 +9,7 @@ namespace itsoneiota\cache;
  * the underlying cache will only be accessed through this object.
  */
 class InMemoryCacheFront extends Cache {
-	
+
 	protected $maxSize;
 	protected $contents;
 	protected $cache;
@@ -25,7 +25,7 @@ class InMemoryCacheFront extends Cache {
 		$this->maxSize = $maxSize;
 		$this->contents = array();
 	}
-	
+
 	/**
 	 * Add an item under a new key.
 	 *
@@ -48,11 +48,11 @@ class InMemoryCacheFront extends Cache {
 			array_shift($this->contents);
 		}
 	}
-	
+
 	/**
 	 * Delete an item.
 	 *
-	 * @param string $key 
+	 * @param string $key
 	 * @return boolean Returns TRUE on success or FALSE on failure.
 	 */
 	public function delete($key) {
@@ -62,7 +62,7 @@ class InMemoryCacheFront extends Cache {
 		}
 		return $success;
 	}
-	
+
 	/**
 	 * Invalidate all items in the cache.
 	 *
@@ -74,14 +74,18 @@ class InMemoryCacheFront extends Cache {
 			$this->contents = array();
 		}
 	}
-	
+
 	/**
 	 * Retrieve an item.
 	 *
-	 * @param string $key The key of the item to retrieve.
+	 * @param mixed $key The key of the item to retrieve, or an array of keys.
 	 * @return mixed Returns the value stored in the cache or NULL otherwise.
 	 */
 	public function get($key) {
+		return is_array($key) ? $this->multiGet($key) : $this->singleGet($key);
+	}
+
+	protected function singleGet($key){
 		$result = array_key_exists($key, $this->contents) ? $this->contents[$key] : $this->cache->get($key);
 		if (NULL !== $result) {
 			$this->contents[$key] = $result;
@@ -89,7 +93,15 @@ class InMemoryCacheFront extends Cache {
 		}
 		return $result;
 	}
-	
+
+	protected function multiGet(array $keys){
+		$results = [];
+		foreach ($keys as $key) {
+			$results[$key] = $this->singleGet($key);
+		}
+		return $results;
+	}
+
 	/**
 	 * Replace the item under an existing key.
 	 *
@@ -105,7 +117,7 @@ class InMemoryCacheFront extends Cache {
 		}
 		return $success;
 	}
-	
+
 	/**
 	 * Store an item.
 	 *
