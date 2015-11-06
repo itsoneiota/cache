@@ -169,22 +169,21 @@ class InMemoryCacheFrontTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function canMultiGet() {
-		$this->cache->set('myKey', 'before');
-		$this->cache->set('otherKey', 'otherValue');
+		$cache = $this->getMockBuilder('\itsoneiota\cache\Cache')->disableOriginalConstructor()->getMock();
+		$this->sut = new InMemoryCacheFront($cache);
 
-		$this->assertEquals('before', $this->sut->get('myKey'));
+		$cache->expects($this->at(0))->method('get')->with($this->equalTo(['a','c']))->will($this->returnValue(['a'=>'apple', 'c'=>'carrot']));
+		$cache->expects($this->at(1))->method('get')->with($this->equalTo(['b','d']))->will($this->returnValue(['b'=>'biscuit', 'd'=>'donut']));
 
-		$results = $this->sut->get(['myKey','otherKey']);
-		$this->assertEquals('before', $results['myKey']);
-		$this->assertEquals('otherValue', $results['otherKey']);
+		$results = $this->sut->get(['a','c']);
+		$this->assertEquals('apple', $results['a']);
+		$this->assertEquals('carrot', $results['c']);
 
-		// We can be sure that the SUT has cached the value by changing it in the underlying cache.
-		$this->cache->set('myKey', 'after');
-		$this->cache->set('otherKey', 'otherAfter');
-
-		$results = $this->sut->get(['myKey','otherKey']);
-		$this->assertEquals('before', $results['myKey']);
-		$this->assertEquals('otherValue', $results['otherKey']);
+		$results = $this->sut->get(['a','b', 'c', 'd']);
+		$this->assertEquals('apple', $results['a']);
+		$this->assertEquals('biscuit', $results['b']);
+		$this->assertEquals('carrot', $results['c']);
+		$this->assertEquals('donut', $results['d']);
 	}
 
 }

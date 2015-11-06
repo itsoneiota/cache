@@ -96,9 +96,35 @@ class InMemoryCacheFront extends Cache {
 
 	protected function multiGet(array $keys){
 		$results = [];
+		$keysToFind = [];
 		foreach ($keys as $key) {
-			$results[$key] = $this->singleGet($key);
+			if(array_key_exists($key, $this->contents)){
+				 $results[$key] = $this->contents[$key];
+			}else{
+				$keysToFind[] = $key;
+			}
 		}
+		if (empty($keysToFind)) {
+			// Everything was found in local memory.
+			// No need to checkLength.
+			return $results;
+		}
+		$cacheResults = [];
+		if (count($keysToFind) == 1) {
+			$key = reset($keysToFind);
+			$results[$key] = $this->singleGet($key);
+		}else{
+			$results = array_merge($results, $this->multiGetFromCache($keysToFind));
+		}
+		return $results;
+	}
+
+	protected function multiGetFromCache(array $keysToFind){
+		$results = $this->cache->get($keysToFind);
+		foreach ($results as $key => $value) {
+			$this->contents[$key] = $value;
+		}
+		$this->checkLength();
 		return $results;
 	}
 
