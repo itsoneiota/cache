@@ -1,6 +1,5 @@
 <?php
 namespace itsoneiota\cache;
-use \base\common\domain\Store;
 
 /**
  * Limited interface to Memcached.
