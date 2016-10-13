@@ -206,16 +206,6 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * It should get the result code and message from the Memcached client.
-	 * @test
-	 */
-	public function canGetResultCodeAndMessage() {
-		// No-op
-		$this->assertNull($this->sut->getResultCode());
-		$this->assertNull($this->sut->getResultMessage());
-	}
-
-	/**
 	 * It should increment.
 	 * @test
 	 */

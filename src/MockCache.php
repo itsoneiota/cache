@@ -213,5 +213,4 @@ class MockCache extends \itsoneiota\cache\Cache {
 		}
 		return $this->set($key, max($currentValue-$offset, 0), $expiry);
 	}
-
 }

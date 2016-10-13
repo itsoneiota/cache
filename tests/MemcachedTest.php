@@ -1,17 +1,17 @@
 <?php
 namespace itsoneiota\cache;
 /**
- * Tests for Cache.
+ * Tests for Memcached.
  *
  **/
-class CacheTest extends \PHPUnit_Framework_TestCase {
+class MemcachedTest extends \PHPUnit_Framework_TestCase {
 
 	protected $sut;
 	protected $cache;
 
 	public function setUp() {
 		$this->cache = $this->getMockBuilder('\Memcached')->disableOriginalConstructor()->getMock();
-		$this->sut = new Cache($this->cache);
+		$this->sut = new Memcached($this->cache);
 	}
 
 	/**
@@ -28,7 +28,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function canAddWithKeyPrefix() {
-		$this->sut = new Cache($this->cache, 'MYPREFIX');
+		$this->sut = new Memcached($this->cache, 'MYPREFIX');
 		$this->cache->expects($this->once())->method('add')->with($this->equalTo('MYPREFIX.myKey'),$this->equalTo('myValue'),$this->equalTo(0))->will($this->returnValue(TRUE));
 		$this->assertTrue($this->sut->add('myKey','myValue'));
 	}
@@ -38,7 +38,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function canSetKeyPrefix() {
-		$this->sut = new Cache($this->cache, 'MYPREFIX');
+		$this->sut = new Memcached($this->cache, 'MYPREFIX');
 		$this->assertEquals('MYPREFIX.', $this->sut->getKeyPrefix());
 
 		$this->sut->setKeyPrefix('NEWPREFIX');
@@ -62,7 +62,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function canGetWithKeyPrefix() {
-		$this->sut = new Cache($this->cache, 'MYPREFIX');
+		$this->sut = new Memcached($this->cache, 'MYPREFIX');
 		$this->cache->expects($this->once())->method('get')->with($this->equalTo('MYPREFIX.myKey'))->will($this->returnValue('myValue'));
 		$this->assertEquals('myValue', $this->sut->get('myKey'));
 	}
@@ -73,7 +73,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function canAddWithDefaultExpiration() {
 		$this->cache->expects($this->once())->method('add')->with($this->equalTo('myKey'),$this->equalTo('myValue'),$this->equalTo(5))->will($this->returnValue(TRUE));
-		$this->sut = new Cache($this->cache,NULL,5);
+		$this->sut = new Memcached($this->cache,NULL,5);
 		$this->assertTrue($this->sut->add('myKey','myValue'));
 	}
 
@@ -83,7 +83,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function canAddWithExplicitExpiration() {
 		$this->cache->expects($this->once())->method('add')->with($this->equalTo('myKey'),$this->equalTo('myValue'),$this->equalTo(10))->will($this->returnValue(TRUE));
-		$this->sut = new Cache($this->cache);
+		$this->sut = new Memcached($this->cache);
 		$this->assertTrue($this->sut->add('myKey','myValue',10));
 	}
 
@@ -93,7 +93,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function canSetWithExplicitExpiration() {
 		$this->cache->expects($this->once())->method('set')->with($this->equalTo('myKey'),$this->equalTo('myValue'),$this->equalTo(10))->will($this->returnValue(TRUE));
-		$this->sut = new Cache($this->cache);
+		$this->sut = new Memcached($this->cache);
 		$this->assertTrue($this->sut->set('myKey','myValue',10));
 	}
 
@@ -111,7 +111,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function canReplaceWithKeyPrefix() {
-		$this->sut = new Cache($this->cache, 'MYPREFIX');
+		$this->sut = new Memcached($this->cache, 'MYPREFIX');
 		$this->cache->expects($this->once())->method('replace')->with($this->equalTo('MYPREFIX.myKey'),$this->equalTo('myValue'),$this->equalTo(0))->will($this->returnValue(TRUE));
 		$this->assertTrue($this->sut->replace('myKey','myValue'));
 	}
@@ -122,7 +122,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function canReplaceWithDefaultExpiration() {
 		$this->cache->expects($this->once())->method('replace')->with($this->equalTo('myKey'),$this->equalTo('myValue'),$this->equalTo(5))->will($this->returnValue(TRUE));
-		$this->sut = new Cache($this->cache,NULL,5);
+		$this->sut = new Memcached($this->cache,NULL,5);
 		$this->assertTrue($this->sut->replace('myKey','myValue'));
 	}
 
@@ -132,7 +132,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function canReplaceWithExplicitExpiration() {
 		$this->cache->expects($this->once())->method('replace')->with($this->equalTo('myKey'),$this->equalTo('myValue'),$this->equalTo(10))->will($this->returnValue(TRUE));
-		$this->sut = new Cache($this->cache);
+		$this->sut = new Memcached($this->cache);
 		$this->assertTrue($this->sut->replace('myKey','myValue',10));
 	}
 
@@ -240,7 +240,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function canGetMultiWithPrefix() {
-		$this->sut = new Cache($this->cache, 'MYPREFIX');
+		$this->sut = new Memcached($this->cache, 'MYPREFIX');
 		$this->cache->expects($this->once())->method('getMulti')->with($this->equalTo(['MYPREFIX.a','MYPREFIX.b']))->will($this->returnValue(['MYPREFIX.a'=>TRUE,'MYPREFIX.b'=>FALSE]));
 		$result = $this->sut->get(['a','b']);
 		$this->assertTrue($result['a']);
