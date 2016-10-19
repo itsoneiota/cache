@@ -6,7 +6,7 @@ namespace itsoneiota\cache;
  */
 class Redis extends Cache {
 
-	protected $cache;
+	protected $client;
 
 	/**
 	 * Constructor.
@@ -15,8 +15,8 @@ class Redis extends Cache {
 	 * @param string $keyPrefix A prefix used before every cache key.
 	 * @param int $defaultExpiration Default expiration time, in seconds. This can be overridden when adding/setting individual items.
 	 */
-	public function __construct(\Predis\ClientInterface $cache, $keyPrefix=NULL, $defaultExpiration=NULL ){
-		$this->cache = $cache;
+	public function __construct(\Predis\ClientInterface $client, $keyPrefix=NULL, $defaultExpiration=NULL ){
+		$this->client = $client;
 		$this->setDefaultExpiration($defaultExpiration);
 
 		$this->setKeyPrefix($keyPrefix);
@@ -57,7 +57,7 @@ class Redis extends Cache {
 				$method = 'setnx';
 			}
 		}
-		$resp = call_user_func_array([$this->cache, $method], $args);
+		$resp = call_user_func_array([$this->client, $method], $args);
 		$result = (is_int($resp) && $resp==1) || (string)$resp == 'OK';
 
 		return $result;
@@ -70,7 +70,7 @@ class Redis extends Cache {
 	 * @return boolean Returns TRUE on success or FALSE on failure.
 	 */
 	public function delete($key) {
-		return 1==$this->cache->del($this->mapKey($key));
+		return 1==$this->client->del($this->mapKey($key));
 	}
 
 	/**
@@ -79,7 +79,7 @@ class Redis extends Cache {
 	 * @return boolean Returns TRUE on success or FALSE on failure.
 	 */
 	public function flush() {
-		return $this->cache->flushall();
+		return $this->client->flushall();
 	}
 
 	/**
@@ -92,7 +92,7 @@ class Redis extends Cache {
 		if (is_array($key)) {
 			return $this->multiGet($key);
 		}
-		$value = $this->unmapValue($this->cache->get($this->mapKey($key)));
+		$value = $this->unmapValue($this->client->get($this->mapKey($key)));
 		return $value === FALSE ? NULL : $value;
 	}
 
@@ -102,7 +102,7 @@ class Redis extends Cache {
 			$mappedKeys[$i] = $this->mapKey($key);
 		}
 
-		$values = $this->cache->mget($mappedKeys);
+		$values = $this->client->mget($mappedKeys);
 		if($values === FALSE) {
 			return NULL;
 		}
@@ -126,7 +126,7 @@ class Redis extends Cache {
 	public function replace($key, $value, $expiration=NULL){
 		// TODO: This would be better using SET with the XX option,
 		// but I don't think it's possible to use SET without expiry.
-		if(!$this->cache->exists($this->mapKey($key))){
+		if(!$this->client->exists($this->mapKey($key))){
 			return FALSE;
 		}
 		return $this->setKey(
@@ -170,22 +170,18 @@ class Redis extends Cache {
 
 	// Generic increment/decrement.
 	protected function offset($key, $offset, $initialValue, $expiry){
-		$method = $offset < 0 ? 'decrby' : 'incrby';
-		$offset = abs($offset);
 		$k = $this->mapKey($key);
 		$x = $this->mapExpiration($expiry);
 
-		// TODO: Make setting the initial value more efficient.
-		if($initialValue != 0){
-			$this->add($k, $initialValue, $expiry);
-		}
-		// Return value is new value of key, so not useful for func return.
-		$this->cache->$method($k, $offset);
-
-		// TODO: Make setting the expiry more efficient.
-		if($x){
-			$this->cache->expire($k, $x);
-		}
+		$responses = $this->client->pipeline(function ($pipe) use($k,$offset,$initialValue,$x){
+			if($offset != 0){
+				$pipe->setnx($k,$initialValue);
+			}
+			$pipe->incrby($k, $offset);
+			if(NULL !== $x){
+				$pipe->expire($k, $x);
+			}
+		});
 		return TRUE;
 	}
 

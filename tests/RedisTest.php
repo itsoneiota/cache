@@ -219,6 +219,34 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * It should increment.
+	 * @test
+	 */
+	public function canIncrementWithNonZeroInitialValue() {
+		// Doesn't exist yet.
+		$this->assertTrue($this->sut->increment('myKey', 3, 5));
+		$this->assertEquals(8, $this->client->get('myKey'));
+
+		// Initial value should only be used if the key doesn't exist.
+		$this->assertTrue($this->sut->increment('myKey', 2, 999));
+		$this->assertEquals(10, $this->client->get('myKey'));
+	}
+
+	/**
+	 * It should increment using key prefixes.
+	 * @test
+	 */
+	public function canIncrementWithPrefix() {
+		$this->sut = new Redis($this->client, 'MYPREFIX', 666);
+		// Doesn't exist yet.
+		$this->assertTrue($this->sut->increment('myKey'));
+		$this->assertEquals(1, $this->client->get('MYPREFIX.myKey'));
+
+		$this->assertTrue($this->sut->increment('myKey'));
+		$this->assertEquals(2, $this->client->get('MYPREFIX.myKey'));
+	}
+
+	/**
 	 * It should increment with TTLs.
 	 * @test
 	 */
