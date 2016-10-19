@@ -40,7 +40,6 @@ class Redis extends Cache {
 	}
 
 	protected function setKey($k, $v, $x=NULL, $option=NULL){
-		$method = 'set';
 		$args = [$k, $v];
 
 		// Basics
@@ -49,15 +48,9 @@ class Redis extends Cache {
 			$args[] = $x;
 		}
 		if($option){
-			if($x){
-				$args[] = $option;
-			}elseif($option == 'NX'){
-				// I haven't found a null value for expiry, 
-				// so we have to switch to setnx here.
-				$method = 'setnx';
-			}
+			$args[] = $option;
 		}
-		$resp = call_user_func_array([$this->client, $method], $args);
+		$resp = call_user_func_array([$this->client, 'set'], $args);
 		$result = (is_int($resp) && $resp==1) || (string)$resp == 'OK';
 
 		return $result;
@@ -124,15 +117,11 @@ class Redis extends Cache {
 	 * @return boolean TRUE on success or FALSE on failure.
 	 */
 	public function replace($key, $value, $expiration=NULL){
-		// TODO: This would be better using SET with the XX option,
-		// but I don't think it's possible to use SET without expiry.
-		if(!$this->client->exists($this->mapKey($key))){
-			return FALSE;
-		}
 		return $this->setKey(
 			$this->mapKey($key),
 			$this->mapValue($value),
-			$this->mapExpiration($expiration)
+			$this->mapExpiration($expiration),
+			'XX'
 		);
 	}
 
