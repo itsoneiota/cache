@@ -168,23 +168,6 @@ class Redis extends Cache {
 		return $this->offset($key, $offset, $initialValue, $expiry);
 	}
 
-	// Generic increment/decrement.
-	protected function offset($key, $offset, $initialValue, $expiry){
-		$k = $this->mapKey($key);
-		$x = $this->mapExpiration($expiry);
-
-		$responses = $this->client->pipeline(function ($pipe) use($k,$offset,$initialValue,$x){
-			if($offset != 0){
-				$pipe->setnx($k,$initialValue);
-			}
-			$pipe->incrby($k, $offset);
-			if(NULL !== $x){
-				$pipe->expire($k, $x);
-			}
-		});
-		return TRUE;
-	}
-
 	/**
 	 * Decrements a numeric item's value by the specified offset.
 	 * If the item's value is not numeric, an error will result.
@@ -200,6 +183,23 @@ class Redis extends Cache {
 	 */
 	public function decrement($key, $offset=1, $initialValue=0, $expiry=NULL){
 		return $this->offset($key, -1 * $offset, $initialValue, $expiry);
+	}
+
+	// Generic increment/decrement.
+	protected function offset($key, $offset, $initialValue, $expiry){
+		$k = $this->mapKey($key);
+		$x = $this->mapExpiration($expiry);
+
+		$responses = $this->client->pipeline(function ($pipe) use($k,$offset,$initialValue,$x){
+			if($offset != 0){
+				$pipe->setnx($k,$initialValue);
+			}
+			$pipe->incrby($k, $offset);
+			if(NULL !== $x){
+				$pipe->expire($k, $x);
+			}
+		});
+		return TRUE;
 	}
 
 }
