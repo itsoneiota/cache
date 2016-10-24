@@ -12,7 +12,6 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 
 	public function setUp() {
 		$this->client = new Client();
-		$this->client->set('a','b','ex',100,'NX');
 		$this->client->flushall();
 		$this->sut = new Redis($this->client);
 	}
@@ -55,8 +54,12 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 	public function canAddWithKeyPrefix() {
 		$this->sut = new Redis($this->client, 'MYPREFIX');
 		$this->assertTrue($this->sut->add('myKey','myValue'));
+
+		$other = new Redis($this->client, 'OTHERPREFIX');
+		$this->assertTrue($other->add('myKey','otherValue'));
+
 		$this->assertEquals('myValue', $this->sut->get('myKey'));
-		$this->assertEquals('myValue', $this->client->get('MYPREFIX.myKey'));
+		$this->assertEquals('otherValue', $other->get('myKey'));
 	}
 
 	/**
@@ -65,13 +68,16 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function canSetKeyPrefix() {
 		$this->sut = new Redis($this->client, 'MYPREFIX');
-		$this->assertEquals('MYPREFIX.', $this->sut->getKeyPrefix());
-
-		$this->sut->setKeyPrefix('NEWPREFIX');
-		$this->assertEquals('NEWPREFIX.', $this->sut->getKeyPrefix());
-
 		$this->assertTrue($this->sut->add('myKey','myValue'));
-		$this->assertEquals('myValue', $this->client->get('NEWPREFIX.myKey'));
+
+		$this->sut->setKeyPrefix('OTHERPREFIX');
+		$this->assertTrue($this->sut->add('myKey','otherValue'));
+
+		$this->sut->setKeyPrefix('MYPREFIX');
+		$this->assertEquals('myValue', $this->sut->get('myKey'));
+
+		$this->sut->setKeyPrefix('OTHERPREFIX');
+		$this->assertEquals('otherValue', $this->sut->get('myKey'));
 	}
 
 	/**
@@ -79,17 +85,7 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function canGet() {
-		$this->client->set('myKey','myValue');
-		$this->assertEquals('myValue', $this->sut->get('myKey'));
-	}
-
-	/**
-	 * It should get a KVP.
-	 * @test
-	 */
-	public function canGetWithKeyPrefix() {
-		$this->sut = new Redis($this->client, 'MYPREFIX');
-		$this->client->set('MYPREFIX.myKey', 'myValue');
+		$this->sut->set('myKey','myValue');
 		$this->assertEquals('myValue', $this->sut->get('myKey'));
 	}
 
@@ -136,7 +132,6 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 		$this->assertTrue($this->sut->set('myKey','myValue'));
 		$this->assertTrue($this->sut->replace('myKey','newValue'));
 		$this->assertEquals('newValue', $this->sut->get('myKey'));
-		$this->assertEquals('newValue',$this->client->get('myKey'));
 	}
 
 	/**
@@ -146,8 +141,15 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 	public function canReplaceWithKeyPrefix() {
 		$this->sut = new Redis($this->client, 'MYPREFIX');
 		$this->assertTrue($this->sut->set('myKey','myValue'));
+
+		$other = new Redis($this->client, 'OTHERPREFIX');
+		$this->assertFalse($other->replace('myKey', 'otherValue'));
+		$this->assertTrue($other->set('myKey','otherValue'));
+		
 		$this->assertTrue($this->sut->replace('myKey','newValue'));
-		$this->assertEquals('newValue',$this->client->get('MYPREFIX.myKey'));
+
+		$this->assertEquals('newValue',$this->sut->get('myKey'));
+		$this->assertEquals('otherValue', $other->get('myKey'));
 	}
 
 	/**
@@ -167,9 +169,9 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function canReplaceWithExplicitExpiration() {
 		$this->sut = new Redis($this->client,NULL,5);
-		$this->client->set('myKey', 'origValue', 'ex', 100);
+		$this->client->set('myKey', '"origValue"', 'ex', 100);
 		$this->assertTrue($this->sut->replace('myKey','myValue', 45));
-		$this->assertEquals('myValue', $this->client->get('myKey'));
+		$this->assertEquals('myValue', $this->sut->get('myKey'));
 		$this->assertTTL('myKey', 45);
 	}
 
@@ -276,9 +278,8 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function canGetMulti() {
-		$this->client->set('a', 'foo');
-		$this->client->set('a', 'foo');
-		$this->client->set('b', 'bar');
+		$this->sut->set('a', 'foo');
+		$this->sut->set('b', 'bar');
 		$result = $this->sut->get(['a','b']);
 		$this->assertEquals('foo', $result['a']);
 		$this->assertEquals('bar', $result['b']);
@@ -290,11 +291,44 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function canGetMultiWithPrefix() {
 		$this->sut = new Redis($this->client, 'MYPREFIX');
-		$this->client->set('MYPREFIX.a', 'foo');
-		$this->client->set('MYPREFIX.b', 'bar');
+		$this->sut->set('a', 'foo');
+		$this->sut->set('b', 'bar');
+
+		$other = new Redis($this->client, 'OTHERPREFIX');
+		$other->set('a', 'FOO');
+		$other->set('b', 'BAR');
+		
 		$result = $this->sut->get(['a','b']);
 		$this->assertEquals('foo', $result['a']);
 		$this->assertEquals('bar', $result['b']);
+
+		$result = $other->get(['a','b']);
+		$this->assertEquals('FOO', $result['a']);
+		$this->assertEquals('BAR', $result['b']);
+	}
+
+	public function valueProvider(){
+		return [
+			'int' => [3],
+			'string' => ['foo'],
+			'arrayOfInts' => [[1,2,3,4,5]],
+			'arrayOfStrings' => [['a','b','c']],
+			'object' => [(object)['foo'=>'bar']]
+		];
+	}
+
+	/**
+	 * It should set and get different types.
+	 * @test
+	 * @dataProvider valueProvider
+	 */
+	public function canSetDifferentTypes($v) {
+		$this->sut->set('myKey', $v);
+		$r = $this->sut->get('myKey');
+		$vType = gettype($v);
+		$rType = gettype($r);
+		$this->assertEquals($vType, $rType, "Type mismatch. Set $vType, got $rType.");
+		$this->assertEquals($v, $r, sprintf("Value mismatch. Set %s, got %s.", print_r($v,TRUE), print_r($r, TRUE)));
 	}
 
 }

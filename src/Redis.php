@@ -22,6 +22,14 @@ class Redis extends Cache {
 		$this->setKeyPrefix($keyPrefix);
 	}
 
+	// Redis doesn't understand our types, so serialise values as JSON.
+	protected function mapValue($v){
+		return json_encode($v);
+	}
+	protected function unmapValue($v){
+		return json_decode($v);
+	}
+
 	/**
 	 * Add an item under a new key.
 	 *
