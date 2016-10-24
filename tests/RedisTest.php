@@ -180,8 +180,8 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function canDelete() {
-		$this->client->set('myKey', 'myValue');
-		$this->client->set('otherKey', 'myValue');
+		$this->sut->set('myKey', 'myValue');
+		$this->sut->set('otherKey', 'myValue');
 		$this->assertKeyExists('myKey');
 		$this->assertTrue($this->sut->delete('myKey'));
 		$this->assertKeyNotExists('myKey');
@@ -193,9 +193,9 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function canFlush() {
-		$this->client->set('a','1');
-		$this->client->set('b','2');
-		$this->client->set('c','3');
+		$this->sut->set('a','1');
+		$this->sut->set('b','2');
+		$this->sut->set('c','3');
 		$this->assertKeyExists('a');
 		$this->assertKeyExists('b');
 		$this->assertKeyExists('c');
@@ -207,6 +207,11 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 		$this->assertKeyNotExists('c');
 	}
 
+	protected function assertIntValue($exp, $act){
+		$this->assertTrue(is_int($act), sprintf("Type mismatch. Expected int, got %s.", gettype($act)));
+		$this->assertSame($exp, $act);
+	}
+
 	/**
 	 * It should increment.
 	 * @test
@@ -214,10 +219,10 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 	public function canIncrement() {
 		// Doesn't exist yet.
 		$this->assertTrue($this->sut->increment('myKey'));
-		$this->assertEquals(1, $this->client->get('myKey'));
+		$this->assertIntValue(1, $this->sut->get('myKey'));
 
 		$this->assertTrue($this->sut->increment('myKey'));
-		$this->assertEquals(2, $this->client->get('myKey'));
+		$this->assertIntValue(2, $this->sut->get('myKey'));
 	}
 
 	/**
@@ -227,11 +232,11 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 	public function canIncrementWithNonZeroInitialValue() {
 		// Doesn't exist yet.
 		$this->assertTrue($this->sut->increment('myKey', 3, 5));
-		$this->assertEquals(8, $this->client->get('myKey'));
+		$this->assertEquals(8, $this->sut->get('myKey'));
 
 		// Initial value should only be used if the key doesn't exist.
 		$this->assertTrue($this->sut->increment('myKey', 2, 999));
-		$this->assertEquals(10, $this->client->get('myKey'));
+		$this->assertIntValue(10, $this->sut->get('myKey'));
 	}
 
 	/**
@@ -242,10 +247,10 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 		$this->sut = new Redis($this->client, 'MYPREFIX', 666);
 		// Doesn't exist yet.
 		$this->assertTrue($this->sut->increment('myKey'));
-		$this->assertEquals(1, $this->client->get('MYPREFIX.myKey'));
+		$this->assertIntValue(1, $this->sut->get('myKey'));
 
 		$this->assertTrue($this->sut->increment('myKey'));
-		$this->assertEquals(2, $this->client->get('MYPREFIX.myKey'));
+		$this->assertIntValue(2, $this->sut->get('myKey'));
 	}
 
 	/**
@@ -255,11 +260,11 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 	public function canIncrementWithTTL() {
 		$this->sut = new Redis($this->client, NULL, 666);
 		$this->assertTrue($this->sut->increment('myKey'));
-		$this->assertEquals(1, $this->client->get('myKey'));
+		$this->assertIntValue(1, $this->sut->get('myKey'));
 		$this->assertTTL('myKey', 666);
 
 		$this->assertTrue($this->sut->increment('myKey', 1, 0, 333));
-		$this->assertEquals(2, $this->client->get('myKey'));
+		$this->assertIntValue(2, $this->sut->get('myKey'));
 		$this->assertTTL('myKey', 333);
 	}
 
@@ -269,7 +274,7 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function canDecrement() {
 		$this->sut->decrement('myKey', 1, 100, 666);
-		$this->assertEquals(99, $this->client->get('myKey'));
+		$this->assertIntValue(99, $this->sut->get('myKey'));
 		$this->assertTTL('myKey', 666);
 	}
 
