@@ -86,7 +86,11 @@ class InMemoryCacheFront extends Cache {
 	}
 
 	protected function singleGet($key){
-		$result = array_key_exists($key, $this->contents) ? $this->contents[$key] : $this->cache->get($key);
+		return array_key_exists($key, $this->contents) ? $this->contents[$key] : $this->doGet($key);
+	}
+
+	protected function doGet($key){
+		$result = $this->cache->get($key);
 		if (NULL !== $result) {
 			$this->contents[$key] = $result;
 			$this->checkLength();
@@ -174,11 +178,7 @@ class InMemoryCacheFront extends Cache {
 	public function increment($key, $offset=1, $initialValue=0, $expiry=NULL){
 		$success = $this->cache->increment($this->mapKey($key), $offset, $initialValue, $this->mapExpiration($expiry));
 		if ($success) {
-			if (array_key_exists($key, $this->contents)) {
-				$this->contents[$key] += $offset;
-			}else{
-				$this->contents[$key] = $initialValue;
-			}
+			$this->doGet($key);
 			$this->checkLength();
 		}
 		return $success;
@@ -198,11 +198,7 @@ class InMemoryCacheFront extends Cache {
 	public function decrement($key, $offset=1, $initialValue=0, $expiry=NULL){
 		$success = $this->cache->decrement($this->mapKey($key), $offset, $initialValue, $this->mapExpiration($expiry));
 		if ($success) {
-			if (array_key_exists($key, $this->contents)) {
-				$this->contents[$key] = max($this->contents[$key]-$offset, 0);
-			}else{
-				$this->contents[$key] = $initialValue;
-			}
+			$this->doGet($key);
 			$this->checkLength();
 		}
 		return $success;

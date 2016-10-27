@@ -147,13 +147,25 @@ class InMemoryCacheFrontTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function canIncrementAndDecrement() {
-		// Increment
+		$this->cache->set('alreadyInitialised', 10);
+		$this->assertTrue($this->sut->increment('alreadyInitialised', 1, 5));
+		$this->assertEquals(11, $this->sut->get('alreadyInitialised'));
+		$this->assertTrue($this->sut->increment('alreadyInitialised', 1, 5));
+		$this->assertEquals(12, $this->sut->get('alreadyInitialised'));
+
+		// Increment and initialise.
 		$this->assertTrue($this->sut->increment('initialisedByIncrementing', 1, 5));
 		$this->assertEquals(5, $this->sut->get('initialisedByIncrementing'));
 		$this->assertTrue($this->sut->increment('initialisedByIncrementing', 1, 5));
 		$this->assertEquals(6, $this->sut->get('initialisedByIncrementing'));
 
 		// Decrement
+		$this->cache->set('alreadyInitialised', 10);
+		$this->assertTrue($this->sut->decrement('alreadyInitialised', 1, 5));
+		$this->assertEquals(9, $this->sut->get('alreadyInitialised'));
+		$this->assertTrue($this->sut->decrement('alreadyInitialised', 1, 5));
+		$this->assertEquals(8, $this->sut->get('alreadyInitialised'));
+
 		$this->assertTrue($this->sut->decrement('initialisedByDecrementing', 1, 5));
 		$this->assertEquals(5, $this->sut->get('initialisedByDecrementing'));
 		$this->assertTrue($this->sut->decrement('initialisedByDecrementing', 1, 5));
