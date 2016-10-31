@@ -63,22 +63,6 @@ class InMemoryCacheTest extends \PHPUnit_Framework_TestCase {
 		// Can't delete non-existent value
 		$this->assertFalse($this->sut->delete('nonExistentKey'));
 
-		// Increment
-		$this->assertTrue($this->sut->increment('initialisedByIncrementing', 1, 5));
-		$this->assertEquals(5, $this->sut->get('initialisedByIncrementing'));
-		$this->assertTrue($this->sut->increment('initialisedByIncrementing', 1, 5));
-		$this->assertEquals(6, $this->sut->get('initialisedByIncrementing'));
-
-		// Decrement
-		$this->assertTrue($this->sut->decrement('initialisedByDecrementing', 1, 5));
-		$this->assertEquals(5, $this->sut->get('initialisedByDecrementing'));
-		$this->assertTrue($this->sut->decrement('initialisedByDecrementing', 1, 5));
-		$this->assertEquals(4, $this->sut->get('initialisedByDecrementing'));
-
-		$this->sut->set('nonNumeric', 'A');
-		$this->assertFalse($this->sut->increment('nonNumeric'));
-		$this->assertFalse($this->sut->decrement('nonNumeric'));
-
 		$this->sut->flush();
 
 		$this->assertNull($this->sut->get('myKey'));
