@@ -4,7 +4,7 @@ namespace itsoneiota\cache;
  * Mock cache.
  * @codeCoverageIgnore
  */
-class MockCache extends \itsoneiota\cache\Cache {
+class MockCache extends CacheWrapper implements Cache {
 
 	protected $contents = array();
 	protected $expirations = array();

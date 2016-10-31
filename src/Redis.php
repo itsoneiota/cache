@@ -4,7 +4,7 @@ namespace itsoneiota\cache;
 /**
  * Limited interface to Memcached.
  */
-class Redis extends Cache {
+class Redis extends CacheWrapper implements Cache {
 
 	protected $client;
 

@@ -8,7 +8,7 @@ namespace itsoneiota\cache;
  * The assumption here is that, for the duration of its lifetime,
  * the underlying cache will only be accessed through this object.
  */
-class InMemoryCacheFront extends Cache {
+class InMemoryCacheFront extends CacheWrapper implements Cache {
 
 	protected $maxSize;
 	protected $contents;

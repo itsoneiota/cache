@@ -3,7 +3,7 @@ namespace itsoneiota\cache;
 /**
  * Wrapper for a simple array.
  */
-class InMemoryCache extends Cache {
+class InMemoryCache extends CacheWrapper implements Cache {
 
 	protected $contents = array();
 
