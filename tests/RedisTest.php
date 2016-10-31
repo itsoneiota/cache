@@ -213,72 +213,6 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * It should increment.
-	 * @test
-	 */
-	public function canIncrement() {
-		// Doesn't exist yet.
-		$this->assertTrue($this->sut->increment('myKey'));
-		$this->assertIntValue(1, $this->sut->get('myKey'));
-
-		$this->assertTrue($this->sut->increment('myKey'));
-		$this->assertIntValue(2, $this->sut->get('myKey'));
-	}
-
-	/**
-	 * It should increment.
-	 * @test
-	 */
-	public function canIncrementWithNonZeroInitialValue() {
-		// Doesn't exist yet.
-		$this->assertTrue($this->sut->increment('myKey', 3, 5));
-		$this->assertEquals(8, $this->sut->get('myKey'));
-
-		// Initial value should only be used if the key doesn't exist.
-		$this->assertTrue($this->sut->increment('myKey', 2, 999));
-		$this->assertIntValue(10, $this->sut->get('myKey'));
-	}
-
-	/**
-	 * It should increment using key prefixes.
-	 * @test
-	 */
-	public function canIncrementWithPrefix() {
-		$this->sut = new Redis($this->client, 'MYPREFIX', 666);
-		// Doesn't exist yet.
-		$this->assertTrue($this->sut->increment('myKey'));
-		$this->assertIntValue(1, $this->sut->get('myKey'));
-
-		$this->assertTrue($this->sut->increment('myKey'));
-		$this->assertIntValue(2, $this->sut->get('myKey'));
-	}
-
-	/**
-	 * It should increment with TTLs.
-	 * @test
-	 */
-	public function canIncrementWithTTL() {
-		$this->sut = new Redis($this->client, NULL, 666);
-		$this->assertTrue($this->sut->increment('myKey'));
-		$this->assertIntValue(1, $this->sut->get('myKey'));
-		$this->assertTTL('myKey', 666);
-
-		$this->assertTrue($this->sut->increment('myKey', 1, 0, 333));
-		$this->assertIntValue(2, $this->sut->get('myKey'));
-		$this->assertTTL('myKey', 333);
-	}
-
-	/**
-	 * It should decrement.
-	 * @test
-	 */
-	public function canDecrement() {
-		$this->sut->decrement('myKey', 1, 100, 666);
-		$this->assertIntValue(99, $this->sut->get('myKey'));
-		$this->assertTTL('myKey', 666);
-	}
-
-	/**
 	 * It should get multiple keys at once.
 	 * @test
 	 */
@@ -318,7 +252,8 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 			'string' => ['foo'],
 			'arrayOfInts' => [[1,2,3,4,5]],
 			'arrayOfStrings' => [['a','b','c']],
-			'object' => [(object)['foo'=>'bar']]
+			'object' => [(object)['foo'=>'bar']],
+			'MyClass' => [new MyClass('bar')]
 		];
 	}
 
@@ -334,6 +269,18 @@ class RedisTest extends \PHPUnit_Framework_TestCase {
 		$rType = gettype($r);
 		$this->assertEquals($vType, $rType, "Type mismatch. Set $vType, got $rType.");
 		$this->assertEquals($v, $r, sprintf("Value mismatch. Set %s, got %s.", print_r($v,TRUE), print_r($r, TRUE)));
+		if(is_object($v)){
+			$vClass = get_class($v);
+			$rClass = get_class($r);
+			$this->assertEquals($vClass, $rClass, "Class mismatch. Set $vClass, got $rClass.");
+		}
 	}
 
+}
+
+class MyClass {
+	protected $foo;
+	public function __construct($foo){
+		$this->foo = $foo;
+	}
 }

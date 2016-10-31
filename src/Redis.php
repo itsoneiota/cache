@@ -24,10 +24,10 @@ class Redis extends Cache {
 
 	// Redis doesn't understand our types, so serialise values as JSON.
 	protected function mapValue($v){
-		return json_encode($v);
+		return serialize($v);
 	}
 	protected function unmapValue($v){
-		return json_decode($v);
+		return unserialize($v);
 	}
 
 	/**
@@ -149,54 +149,11 @@ class Redis extends Cache {
 		);
 	}
 
-	/**
-	 * Increment a numeric item's value by the specified offset.
-	 * If the item's value is not numeric, an error will result.
-	 * NB: a non-zero initial value or non-null expiration
-	 * will cause extra calls to be made.
-	 *
-	 * @param string $key The key under which to store the value.
-	 * @param int $offset The amount by which to increment the item's value.
-	 * @param int $initialValue The value to set the item to if it doesn't currently exist.
-	 * @param int $expiration The expiration time.
-	 * @return boolean TRUE on success or FALSE on failure.
-	 */
 	public function increment($key, $offset=1, $initialValue=0, $expiry=NULL){
-		return $this->offset($key, $offset, $initialValue, $expiry);
+		throw new \RuntimeException('Increment is not supported by this Redis client.');
 	}
 
-	/**
-	 * Decrements a numeric item's value by the specified offset.
-	 * If the item's value is not numeric, an error will result.
-	 * If the operation would decrease the value below 0, the new value will be 0.
-	 * NB: a non-zero initial value or non-null expiration
-	 * will cause extra calls to be made.
-	 *
-	 * @param string $key The key under which to store the value.
-	 * @param int $offset The amount by which to increment the item's value.
-	 * @param int $initialValue The value to set the item to if it doesn't currently exist.
-	 * @param int $expiration The expiration time.
-	 * @return boolean TRUE on success or FALSE on failure.
-	 */
 	public function decrement($key, $offset=1, $initialValue=0, $expiry=NULL){
-		return $this->offset($key, -1 * $offset, $initialValue, $expiry);
+		throw new \RuntimeException('Decrement is not supported by this Redis client.');
 	}
-
-	// Generic increment/decrement.
-	protected function offset($key, $offset, $initialValue, $expiry){
-		$k = $this->mapKey($key);
-		$x = $this->mapExpiration($expiry);
-
-		$responses = $this->client->pipeline(function ($pipe) use($k,$offset,$initialValue,$x){
-			if($offset != 0){
-				$pipe->setnx($k,$initialValue);
-			}
-			$pipe->incrby($k, $offset);
-			if(NULL !== $x){
-				$pipe->expire($k, $x);
-			}
-		});
-		return TRUE;
-	}
-
 }
