@@ -2,25 +2,25 @@
 	"name":"itsoneiota/cache",
 	"description": "One iota Cache library.",
 	"type":"library",
-    "keywords": ["cache"],
-    "homepage": "http://itsoneiota.com",
-    "authors": [
-        {
-            "name": "Ross McFarlane",
-            "email": "ross.mcfarlane@itsoneiota.com"
-        }
-    ],
-    "license":"proprietary",
+	"keywords": ["cache"],
+	"homepage": "http://itsoneiota.com",
+	"authors": [
+		{
+			"name": "Ross McFarlane",
+			"email": "ross.mcfarlane@itsoneiota.com"
+		}
+	],
+	"license":"proprietary",
 	"require":{
-		"php":">=5.3.5",
+		"php":">=5.5",
 		"predis/predis": "^1.1"
 	},
 	"require-dev":{
 		"phpunit/phpunit": "*"
 	},
 	"autoload": {
-        "psr-4": {
-            "itsoneiota\\cache\\": "src/"
-        }
-    }
+		"psr-4": {
+			"itsoneiota\\cache\\": "src/"
+		}
+	}
 }
