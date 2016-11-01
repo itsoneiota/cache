@@ -1,8 +1,6 @@
 One iota Cache Library
 ======================
 
-![Travis](https://travis-ci.org/itsoneiota/cache.svg?branch=master)
-
 Overview
 --------
 A simple interface to cache sources.
