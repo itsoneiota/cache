@@ -41,8 +41,7 @@ abstract class CacheWrapper {
 	 * @return string Mapped key.
 	 */
 	protected function mapKey($key) {
-		$key = is_null($this->keyPrefix) ? $key : $this->keyPrefix.$key;
-		return md5($key);
+		return is_null($this->keyPrefix) ? $key : $this->keyPrefix.$key;
 	}
 
 	/**
