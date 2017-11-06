@@ -5,6 +5,7 @@ abstract class CacheWrapper {
 
 	protected $defaultExpiration;
 	protected $keyPrefix;
+    protected $keySuffix;
 
 	public function setKeyPrefix($keyPrefix) {
 		$this->keyPrefix = NULL === $keyPrefix ? NULL : $keyPrefix . '.';
@@ -13,6 +14,14 @@ abstract class CacheWrapper {
 	public function getKeyPrefix() {
 		return $this->keyPrefix;
 	}
+
+    public function setKeySuffix($keySuffix) {
+        $this->keySuffix = NULL === $keySuffix ? NULL : '.' . $keySuffix;
+    }
+
+    public function getKeySuffix() {
+        return $this->keySuffix;
+    }
 
 	/**
 	 * Set the default expiration time.
@@ -41,7 +50,9 @@ abstract class CacheWrapper {
 	 * @return string Mapped key.
 	 */
 	protected function mapKey($key) {
-		return is_null($this->keyPrefix) ? $key : $this->keyPrefix.$key;
+        $key = is_null($this->keyPrefix) ? $key : $this->keyPrefix.$key;
+        $key = is_null($this->keySuffix) ? $key : $key.$this->keySuffix;
+		return $key;
 	}
 
 	/**
