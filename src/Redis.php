@@ -39,7 +39,8 @@ class Redis extends CacheWrapper implements Cache {
 	 * @return boolean TRUE on success or FALSE on failure.
 	 */
 	public function add($key, $value, $expiration = NULL){
-		return $this->setKey(
+        $this->updateMetric("redis","add", $this->mapKey($key));
+        return $this->setKey(
 			$this->mapKey($key),
 			$this->mapValue($value),
 			$this->mapExpiration($expiration),
@@ -71,7 +72,8 @@ class Redis extends CacheWrapper implements Cache {
 	 * @return boolean Returns TRUE on success or FALSE on failure.
 	 */
 	public function delete($key) {
-		return 1==$this->client->del($this->mapKey($key));
+        $this->updateMetric("redis","del", $this->mapKey($key));
+        return 1==$this->client->del($this->mapKey($key));
 	}
 
 	/**
@@ -91,9 +93,11 @@ class Redis extends CacheWrapper implements Cache {
 	 */
 	public function get($key) {
 		if (is_array($key)) {
-			return $this->multiGet($key);
+            $this->updateMetric("redis","mget", $this->mapKey($key));
+            return $this->multiGet($key);
 		}
-		$value = $this->unmapValue($this->client->get($this->mapKey($key)));
+        $this->updateMetric("redis","get", $this->mapKey($key));
+        $value = $this->unmapValue($this->client->get($this->mapKey($key)));
 		return $value === FALSE ? NULL : $value;
 	}
 
@@ -125,7 +129,8 @@ class Redis extends CacheWrapper implements Cache {
 	 * @return boolean TRUE on success or FALSE on failure.
 	 */
 	public function replace($key, $value, $expiration=NULL){
-		return $this->setKey(
+        $this->updateMetric("redis","replace", $this->mapKey($key));
+        return $this->setKey(
 			$this->mapKey($key),
 			$this->mapValue($value),
 			$this->mapExpiration($expiration),
@@ -141,7 +146,8 @@ class Redis extends CacheWrapper implements Cache {
 	 * @param int $expiration The expiration time.
 	 * @return boolean TRUE on success or FALSE on failure.
 	 */
-	public function set($key, $value, $expiration=NULL){
+	public function set($key, $value, $expiration=NULL) {
+        $this->updateMetric("redis","set", $this->mapKey($key));
 		return $this->setKey(
 			$this->mapKey($key),
 			$this->mapValue($value),
@@ -156,4 +162,5 @@ class Redis extends CacheWrapper implements Cache {
 	public function decrement($key, $offset=1, $initialValue=0, $expiry=NULL){
 		throw new \RuntimeException('Decrement is not supported by this Redis client.');
 	}
+
 }

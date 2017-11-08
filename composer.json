@@ -13,7 +13,8 @@
 	"license":"proprietary",
 	"require":{
 		"php":">=5.5",
-		"predis/predis": "^1.1"
+		"predis/predis": "^1.1",
+		"itsoneiota/count": "1.0.0"
 	},
 	"require-dev":{
 		"phpunit/phpunit": "*"
