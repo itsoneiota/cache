@@ -38,7 +38,7 @@ class RedisCluster extends CacheWrapper implements Cache {
             $this->client->set($k, $v, $x);
         }
         else {
-            $this->client->set($k, $v)
+            $this->client->set($k, $v);
         }
     }
 
