@@ -41,7 +41,7 @@ class RedisCluster extends CacheWrapper implements Cache {
         else {
             $resp = $this->client->set($k, $v);
         }
-        return (is_int($resp) && $resp==1) || (string)$resp == 'OK';
+        return $resp;
     }
 
     /**
