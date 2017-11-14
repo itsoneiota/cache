@@ -8,19 +8,21 @@ class Redis extends CacheWrapper implements Cache {
 
 	protected $client;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param \Predis\Client $cache Cache instance.
-	 * @param string $keyPrefix A prefix used before every cache key.
-	 * @param int $defaultExpiration Default expiration time, in seconds. This can be overridden when adding/setting individual items.
-	 */
-	public function __construct(\Predis\ClientInterface $client, $keyPrefix=NULL, $defaultExpiration=NULL ){
+    /**
+     * Constructor.
+     *
+     * @param \Predis\ClientInterface $client
+     * @param string $keyPrefix A prefix used before every cache key.
+     * @param int $defaultExpiration Default expiration time, in seconds. This can be overridden when adding/setting individual items.
+     * @param null $keySuffix
+     * @internal param \Predis\Client $cache Cache instance.
+     */
+	public function __construct(\Predis\ClientInterface $client, $keyPrefix=NULL, $defaultExpiration=NULL, $keySuffix=NULL){
 		$this->client = $client;
 		$this->setDefaultExpiration($defaultExpiration);
-
 		$this->setKeyPrefix($keyPrefix);
-	}
+        $this->setKeySuffix($keySuffix);
+    }
 
 	// Redis doesn't understand our types, so serialise values as JSON.
 	protected function mapValue($v){

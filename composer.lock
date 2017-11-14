@@ -4,9 +4,50 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "17b4c6ff679bf2f10e41da7ce42841b5",
-    "content-hash": "a0876098aa6eefef288dabe47eaaaf97",
+    "hash": "108ab30c83863b1f3494332979238dfe",
+    "content-hash": "14f54a7f56b40004c0fb943b44c3bbab",
     "packages": [
+        {
+            "name": "cheprasov/php-redis-client",
+            "version": "1.7.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cheprasov/php-redis-client.git",
+                "reference": "a04f5430bdc371f790edc9dfceab132654ea7fd8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cheprasov/php-redis-client/zipball/a04f5430bdc371f790edc9dfceab132654ea7fd8",
+                "reference": "a04f5430bdc371f790edc9dfceab132654ea7fd8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5"
+            },
+            "require-dev": {
+                "cheprasov/php-extra-mocks": "^1.0.0",
+                "phpunit/phpunit": "4.8.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "RedisClient\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alexander Cheprasov",
+                    "email": "cheprasov.84@ya.ru"
+                }
+            ],
+            "description": "Php client for Redis. It is a fast, fully-functional and user-friendly client for Redis, optimized for performance. RedisClient supports the latest versions of Redis starting from 2.6 to 4.0",
+            "homepage": "http://github.com/cheprasov/php-redis-client",
+            "time": "2017-08-19 19:22:23"
+        },
         {
             "name": "itsoneiota/count",
             "version": "1.0.0",
