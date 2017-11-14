@@ -34,12 +34,14 @@ class RedisCluster extends CacheWrapper implements Cache {
     }
 
     protected function setKey($k, $v, $x = NULL) {
+        $resp = null;
         if(!empty($x)) {
-            $this->client->set($k, $v, $x);
+            $resp = $this->client->set($k, $v, $x);
         }
         else {
-            $this->client->set($k, $v);
+            $resp = $this->client->set($k, $v);
         }
+        return (is_int($resp) && $resp==1) || (string)$resp == 'OK';
     }
 
     /**
