@@ -53,7 +53,6 @@ class RedisCluster extends CacheWrapper implements Cache {
      * @return boolean TRUE on success or FALSE on failure.
      */
     public function set($key, $value, $expiration=NULL) {
-        $this->updateMetric("redisCluster","set", $this->mapKey($key));
         return $this->setKey(
             $this->mapKey($key),
             $this->mapValue($value),
@@ -71,7 +70,6 @@ class RedisCluster extends CacheWrapper implements Cache {
      */
     public function add($key, $value, $expiration = NULL)
     {
-        $this->updateMetric("redisCluster", "add", $this->mapKey($key));
         return $this->setKey(
             $this->mapKey($key),
             $this->mapValue($value),
@@ -86,7 +84,6 @@ class RedisCluster extends CacheWrapper implements Cache {
      * @return boolean Returns TRUE on success or FALSE on failure.
      */
     public function delete($key) {
-        $this->updateMetric("redisCluster","del", $this->mapKey($key));
         return 1==$this->client->del($this->mapKey($key));
     }
 
@@ -98,10 +95,8 @@ class RedisCluster extends CacheWrapper implements Cache {
      */
     public function get($key) {
         if (is_array($key)) {
-            $this->updateMetric("redisCluster","mget", $this->mapKey($key));
             return $this->multiGet($key);
         }
-        $this->updateMetric("redisCluster","get", $this->mapKey($key));
         $value = $this->unmapValue($this->client->get($this->mapKey($key)));
         return $value === FALSE ? NULL : $value;
     }
@@ -134,7 +129,6 @@ class RedisCluster extends CacheWrapper implements Cache {
      * @return boolean TRUE on success or FALSE on failure.
      */
     public function replace($key, $value, $expiration=NULL){
-        $this->updateMetric("redisCluster","replace", $this->mapKey($key));
         return $this->setKey(
             $this->mapKey($key),
             $this->mapValue($value),
@@ -148,7 +142,6 @@ class RedisCluster extends CacheWrapper implements Cache {
      * @return boolean Returns TRUE on success or FALSE on failure.
      */
     public function flush() {
-        $this->updateMetric("redisCluster","flushAll", $this->mapKey($key));
         return $this->client->flushall();
     }
 
