@@ -14,7 +14,7 @@
 	"require":{
 		"php":">=5.5",
 		"predis/predis": "^1.1",
-		"itsoneiota/count": "1.0.0",
+		"itsoneiota/count": "1.0.0|2.0.0",
 		"cheprasov/php-redis-client": "1.7.2"
 	},
 	"require-dev":{
