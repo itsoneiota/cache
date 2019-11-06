@@ -42,11 +42,9 @@ class Redis extends CacheWrapper implements Cache {
         return gzcompress($value);
 	}
 	protected function unmapValue($v){
-        if($value = gzuncompress($v)){
-            return unserialize($value);
-        };
-        return unserialize($v);
-    }
+        $value = gzuncompress($v);
+        return unserialize($value);
+	}
 
 	/**
 	 * Add an item under a new key.
