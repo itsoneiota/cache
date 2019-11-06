@@ -50,6 +50,7 @@ abstract class CacheWrapper {
      * @param $key
      */
     protected function updateMetric($operation, $key) {
+        var_dump($operation, $key);
         \itsoneiota\count\Counter::increment(
             strtolower(sprintf("%s.%s.%s", "CACHE", $operation, $key))
         );
