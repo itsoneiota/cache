@@ -1,6 +1,5 @@
 <?php
 namespace itsoneiota\cache;
-use itsoneiota\count\StatsD;
 
 abstract class CacheWrapper {
 
@@ -8,7 +7,7 @@ abstract class CacheWrapper {
 	protected $keyPrefix;
     protected $keySuffix;
 
-    public function setKeyPrefix($keyPrefix) {
+	public function setKeyPrefix($keyPrefix) {
 		$this->keyPrefix = NULL === $keyPrefix ? NULL : $keyPrefix . '.';
 	}
 
@@ -44,20 +43,7 @@ abstract class CacheWrapper {
 		return is_null($expiration) ? $this->defaultExpiration : $expiration;
 	}
 
-    /**
-     * @param $implementation
-     * @param $operation
-     * @param $key
-     */
-    protected function updateMetric($operation, $key) {
-        var_dump($operation, $key);
-        \itsoneiota\count\Counter::increment(
-            strtolower(sprintf("%s.%s.%s", "CACHE", $operation, $key))
-        );
-    }
-
-
-    /**
+	/**
 	 * Hook method to map a key, for example to add a prefix.
 	 *
 	 * @param string $key Key to map.

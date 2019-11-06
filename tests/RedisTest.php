@@ -1,16 +1,13 @@
 <?php
 namespace itsoneiota\cache;
-use PHPUnit\Framework\TestCase;
 use \Predis\Client;
 /**
  * Tests for Cache.
  *
  **/
-class RedisTest extends TestCase {
+class RedisTest extends \PHPUnit_Framework_TestCase {
 
-    /** @var  Redis*/
 	protected $sut;
-
 	protected $client;
 
 	public function setUp() {
@@ -40,21 +37,6 @@ class RedisTest extends TestCase {
 		$this->assertEquals('myValue', $this->sut->get('myKey'));
 		$this->assertTTL('myKey',-1);
 	}
-
-    /**
-     * CAN DO METIRCS
-     * @test
-     */
-    public function canDoMetrics()
-    {
-        $this->sut =\Mockery::mock(Redis::class)->makePartial()->shouldAllowMockingProtectedMethods();
-        $this->sut->setClient($this->client);
-        $this->sut->shouldReceive("getLogMetrics")->twice()->andReturnTrue();
-        $this->sut->shouldReceive('updateMetric')->once()->withArgs(["add", "myKey"]);
-        $this->sut->shouldReceive('updateMetric')->once()->withArgs(["get", "myKey"]);
-        $this->assertTrue($this->sut->add('myKey', 'myValue'));
-        $this->assertEquals('myValue', $this->sut->get('myKey'));
-    }
 
 	/**
 	 * It should add a KVP.
@@ -163,7 +145,7 @@ class RedisTest extends TestCase {
 		$other = new Redis($this->client, 'OTHERPREFIX');
 		$this->assertFalse($other->replace('myKey', 'otherValue'));
 		$this->assertTrue($other->set('myKey','otherValue'));
-
+		
 		$this->assertTrue($this->sut->replace('myKey','newValue'));
 
 		$this->assertEquals('newValue',$this->sut->get('myKey'));
@@ -217,7 +199,7 @@ class RedisTest extends TestCase {
 		$this->assertKeyExists('a');
 		$this->assertKeyExists('b');
 		$this->assertKeyExists('c');
-
+		
 		$this->sut->flush();
 
 		$this->assertKeyNotExists('a');
@@ -254,7 +236,7 @@ class RedisTest extends TestCase {
 		$other = new Redis($this->client, 'OTHERPREFIX');
 		$other->set('a', 'FOO');
 		$other->set('b', 'BAR');
-
+		
 		$result = $this->sut->get(['a','b']);
 		$this->assertEquals('foo', $result['a']);
 		$this->assertEquals('bar', $result['b']);
