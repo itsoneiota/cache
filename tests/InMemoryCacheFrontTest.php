@@ -1,10 +1,12 @@
 <?php
 namespace itsoneiota\cache;
+use PHPUnit\Framework\TestCase;
+
 /**
  * Tests for InMemoryCacheFront.
  *
  **/
-class InMemoryCacheFrontTest extends \PHPUnit_Framework_TestCase {
+class InMemoryCacheFrontTest extends TestCase {
 
 	protected $sut;
 
