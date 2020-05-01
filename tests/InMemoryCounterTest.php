@@ -4,7 +4,7 @@ namespace itsoneiota\cache;
  * Tests for Cache.
  *
  **/
-class InMemoryCounterTest extends \PHPUnit_Framework_TestCase {
+class InMemoryCounterTest extends \PHPUnit\Framework\TestCase {
 
 	protected $sut;
 	protected $cache;

@@ -4,7 +4,7 @@ namespace itsoneiota\cache;
  * Tests for Memcached.
  *
  **/
-class MemcachedTest extends \PHPUnit_Framework_TestCase {
+class MemcachedTest extends \PHPUnit\Framework\TestCase {
 
 	protected $sut;
 	protected $cache;
