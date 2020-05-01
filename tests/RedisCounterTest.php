@@ -5,7 +5,7 @@ use \Predis\Client;
  * Tests for Cache.
  *
  **/
-class RedisCounterTest extends \PHPUnit_Framework_TestCase {
+class RedisCounterTest extends \PHPUnit\Framework\TestCase {
 
 	protected $sut;
 	protected $client;
