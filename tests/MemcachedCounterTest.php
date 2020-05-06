@@ -1,13 +1,15 @@
 <?php
 namespace itsoneiota\cache;
+use PHPUnit\Framework\TestCase;
+
 /**
  * Tests for Memcached.
  *
  **/
-class MemcachedCounterTest extends \PHPUnit\Framework\TestCase {
-
+class MemcachedCounterTest extends TestCase {
 	protected $sut;
-	protected $cache;
+    /** @var  Memcached*/
+    protected $cache;
 
 	public function setUp() {
 		$this->cache = $this->getMockBuilder('\Memcached')->disableOriginalConstructor()->getMock();
@@ -94,5 +96,4 @@ class MemcachedCounterTest extends \PHPUnit\Framework\TestCase {
 		$this->assertTrue($result['a']);
 		$this->assertFalse($result['b']);
 	}
-
 }

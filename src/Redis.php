@@ -6,7 +6,9 @@ namespace itsoneiota\cache;
  */
 class Redis extends CacheWrapper implements Cache {
 
-	protected $client;
+    protected $client;
+
+    protected $logMetrics;
 
     /**
      * Constructor.
@@ -15,22 +17,32 @@ class Redis extends CacheWrapper implements Cache {
      * @param string $keyPrefix A prefix used before every cache key.
      * @param int $defaultExpiration Default expiration time, in seconds. This can be overridden when adding/setting individual items.
      * @param null $keySuffix
+     * @param false $metrics
      * @internal param \Predis\Client $cache Cache instance.
      */
-	public function __construct(\Predis\ClientInterface $client, $keyPrefix=NULL, $defaultExpiration=NULL, $keySuffix=NULL){
-		$this->client = $client;
-		$this->setDefaultExpiration($defaultExpiration);
-		$this->setKeyPrefix($keyPrefix);
+    public function __construct(
+        \Predis\ClientInterface $client,
+        $keyPrefix = null,
+        $defaultExpiration = null,
+        $keySuffix = null,
+        $metrics = false
+    ) {
+        $this->client = $client;
+        $this->setDefaultExpiration($defaultExpiration);
+        $this->setKeyPrefix($keyPrefix);
         $this->setKeySuffix($keySuffix);
+        $this->setLogMetrics($metrics);
     }
+
+
 
 	// Redis doesn't understand our types, so serialise values as JSON.
 	protected function mapValue($v){
-		return serialize($v);
+        return serialize($v);
 	}
 	protected function unmapValue($v){
-		return unserialize($v);
-	}
+        return unserialize($v);
+    }
 
 	/**
 	 * Add an item under a new key.
@@ -41,6 +53,9 @@ class Redis extends CacheWrapper implements Cache {
 	 * @return boolean TRUE on success or FALSE on failure.
 	 */
 	public function add($key, $value, $expiration = NULL){
+        if($this->getLogMetrics()){
+            $this->updateMetric("add", $this->mapKey($key));
+        }
         return $this->setKey(
 			$this->mapKey($key),
 			$this->mapValue($value),
@@ -73,6 +88,9 @@ class Redis extends CacheWrapper implements Cache {
 	 * @return boolean Returns TRUE on success or FALSE on failure.
 	 */
 	public function delete($key) {
+        if($this->getLogMetrics()){
+            $this->updateMetric("del", $this->mapKey($key));
+        }
         return 1==$this->client->del($this->mapKey($key));
 	}
 
@@ -92,6 +110,9 @@ class Redis extends CacheWrapper implements Cache {
 	 * @return mixed Returns the value stored in the cache or FALSE otherwise.
 	 */
 	public function get($key) {
+        if($this->getLogMetrics()){
+            $this->updateMetric("get", $this->mapKey($key));
+        }
 		if (is_array($key)) {
             return $this->multiGet($key);
 		}
@@ -127,6 +148,9 @@ class Redis extends CacheWrapper implements Cache {
 	 * @return boolean TRUE on success or FALSE on failure.
 	 */
 	public function replace($key, $value, $expiration=NULL){
+        if($this->getLogMetrics()){
+            $this->updateMetric("replace", $this->mapKey($key));
+        }
         return $this->setKey(
 			$this->mapKey($key),
 			$this->mapValue($value),
@@ -144,6 +168,9 @@ class Redis extends CacheWrapper implements Cache {
 	 * @return boolean TRUE on success or FALSE on failure.
 	 */
 	public function set($key, $value, $expiration=NULL) {
+        if($this->getLogMetrics()){
+            $this->updateMetric("SET", $this->mapKey($key));
+        }
 		return $this->setKey(
 			$this->mapKey($key),
 			$this->mapValue($value),
@@ -158,5 +185,37 @@ class Redis extends CacheWrapper implements Cache {
 	public function decrement($key, $offset=1, $initialValue=0, $expiry=NULL){
 		throw new \RuntimeException('Decrement is not supported by this Redis client.');
 	}
+
+    /**
+     * @return mixed
+     */
+    public function getLogMetrics()
+    {
+        return $this->logMetrics;
+    }
+
+    /**
+     * @param mixed $logMetrics
+     */
+    public function setLogMetrics($logMetrics)
+    {
+        $this->logMetrics = $logMetrics;
+    }
+
+    /**
+     * @return \Predis\ClientInterface
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    /**
+     * @param \Predis\ClientInterface $client
+     */
+    public function setClient($client)
+    {
+        $this->client = $client;
+    }
 
 }

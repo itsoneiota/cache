@@ -1,11 +1,12 @@
 <?php
 namespace itsoneiota\cache;
+use PHPUnit\Framework\TestCase;
+
 /**
  * Tests for Memcached.
  *
  **/
-class MemcachedTest extends \PHPUnit\Framework\TestCase {
-
+class MemcachedTest extends TestCase{
 	protected $sut;
 	protected $cache;
 

@@ -1,10 +1,12 @@
 <?php
 namespace itsoneiota\cache;
+use PHPUnit\Framework\TestCase;
+
 /**
  * Tests for Cache.
  *
  **/
-class InMemoryCacheTest extends \PHPUnit\Framework\TestCase {
+class InMemoryCacheTest extends TestCase {
 
 	protected $sut;
 	protected $cache;
@@ -69,5 +71,4 @@ class InMemoryCacheTest extends \PHPUnit\Framework\TestCase {
 		$this->assertNull($this->sut->get('myKey2'));
 		$this->assertNull($this->sut->get('otherKey'));
 	}
-
 }

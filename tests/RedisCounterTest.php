@@ -1,12 +1,12 @@
 <?php
 namespace itsoneiota\cache;
+use PHPUnit\Framework\TestCase;
 use \Predis\Client;
 /**
  * Tests for Cache.
  *
  **/
-class RedisCounterTest extends \PHPUnit\Framework\TestCase {
-
+class RedisCounterTest extends TestCase {
 	protected $sut;
 	protected $client;
 

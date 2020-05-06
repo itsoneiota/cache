@@ -1,11 +1,13 @@
 <?php
 namespace itsoneiota\cache;
+use PHPUnit\Framework\TestCase;
+
 /**
  * Tests for Cache.
  *
  **/
-class InMemoryCounterTest extends \PHPUnit\Framework\TestCase {
 
+class InMemoryCounterTest extends TestCase {
 	protected $sut;
 	protected $cache;
 
